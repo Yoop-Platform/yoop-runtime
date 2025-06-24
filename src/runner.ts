@@ -5,6 +5,10 @@ import { CloudEvent, Context } from "./types";
 const app = express();
 app.use(express.json());
 
+app.get("/healthz", (_req, res) => {
+  res.status(200).send("OK");
+});
+
 app.post("/", async (req: Request, res: Response) => {
   const context: Context = {
     log: {
@@ -28,7 +32,7 @@ app.post("/", async (req: Request, res: Response) => {
   }
 });
 
-const port = process.env.PORT ? parseInt(process.env.PORT) : 8081;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3060;
 app.listen(port, () => {
   console.log(`🚀 Serverless function runner listening on port ${port}`);
 });
