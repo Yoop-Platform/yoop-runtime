@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { handle } from "./index";
 import { CloudEvent, Context } from "./types";
+import { insertLog } from "./utils/cassandra";
 
 const app = express();
 app.use(express.json());
@@ -10,11 +11,24 @@ app.get("/healthz", (_req, res) => {
 });
 
 app.post("/", async (req: Request, res: Response) => {
+  const tenantId = process.env.TENANT_ID;
+
+  const logWrapper =
+    (level: "info" | "debug" | "error") =>
+    async (message: string, metadata: Record<string, any> = {}) => {
+      await insertLog({
+        tenant_id: tenantId!,
+        level,
+        message,
+        metadata,
+      });
+    };
+
   const context: Context = {
     log: {
-      info: (...args) => console.log("[INFO]", ...args),
-      debug: (...args) => console.debug("[DEBUG]", ...args),
-      error: (...args) => console.error("[ERROR]", ...args),
+      info: logWrapper("info"),
+      debug: logWrapper("debug"),
+      error: logWrapper("error"),
     },
     headers: req.headers,
     method: req.method,
@@ -23,11 +37,10 @@ app.post("/", async (req: Request, res: Response) => {
 
   try {
     const event = req.body as CloudEvent;
-
-    const result = await handle(context, event);
-    res.status(200).json(result ? result : { status: "ok" });
+    const result: any = await handle(context, event);
+    res.status(200).json(result || { status: "ok" });
   } catch (err) {
-    context.log.error("Function error:", err);
+    console.error("Function error:", err);
     res.status(500).json({ error: (err as Error).message });
   }
 });

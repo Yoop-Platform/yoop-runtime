@@ -6,9 +6,9 @@ export interface CloudEvent<T = unknown> {
 
 export interface Context {
   log: {
-    info: (...args: unknown[]) => void;
-    debug: (...args: unknown[]) => void;
-    error: (...args: unknown[]) => void;
+    info: (message: string, metadata?: Record<string, any>) => Promise<void>;
+    debug: (message: string, metadata?: Record<string, any>) => Promise<void>;
+    error: (message: string, metadata?: Record<string, any>) => Promise<void>;
   };
   headers: Record<string, string | string[] | undefined>;
   method: string;
