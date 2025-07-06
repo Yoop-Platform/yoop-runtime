@@ -4,9 +4,15 @@
     "module": "CommonJS",
     "outDir": "dist",
     "rootDir": "src",
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "resolveJsonModule": true,
+    "allowJs": true
   },
   "include": ["src"]
 }
